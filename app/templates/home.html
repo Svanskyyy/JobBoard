@@ -19,6 +19,151 @@ Jobs | JobBoard
 </div>
 
 
+<div class="card shadow-sm mb-5">
+    <div class="card-body p-4">
+
+        <form
+            method="GET"
+            action="{{ url_for('main.home') }}"
+        >
+
+            <div class="row g-3">
+
+                <div class="col-lg-4">
+                    <label
+                        for="q"
+                        class="form-label"
+                    >
+                        Search
+                    </label>
+
+                    <input
+                        type="text"
+                        class="form-control"
+                        id="q"
+                        name="q"
+                        placeholder="Job title, company..."
+                        value="{{ search_query }}"
+                    >
+                </div>
+
+
+                <div class="col-lg-3">
+                    <label
+                        for="category"
+                        class="form-label"
+                    >
+                        Category
+                    </label>
+
+                    <select
+                        class="form-select"
+                        id="category"
+                        name="category"
+                    >
+
+                        <option value="">
+                            All Categories
+                        </option>
+
+                        {% for category in categories %}
+
+                            <option
+                                value="{{ category.id }}"
+                                {% if selected_category == category.id %}
+                                    selected
+                                {% endif %}
+                            >
+                                {{ category.name }}
+                            </option>
+
+                        {% endfor %}
+
+                    </select>
+                </div>
+
+
+                <div class="col-lg-3">
+                    <label
+                        for="location"
+                        class="form-label"
+                    >
+                        Location
+                    </label>
+
+                    <input
+                        type="text"
+                        class="form-control"
+                        id="location"
+                        name="location"
+                        placeholder="e.g. Tbilisi"
+                        value="{{ location }}"
+                    >
+                </div>
+
+
+                <div class="col-lg-2">
+                    <label
+                        for="sort"
+                        class="form-label"
+                    >
+                        Sort
+                    </label>
+
+                    <select
+                        class="form-select"
+                        id="sort"
+                        name="sort"
+                    >
+
+                        <option
+                            value="newest"
+                            {% if selected_sort == "newest" %}
+                                selected
+                            {% endif %}
+                        >
+                            Newest
+                        </option>
+
+                        <option
+                            value="oldest"
+                            {% if selected_sort == "oldest" %}
+                                selected
+                            {% endif %}
+                        >
+                            Oldest
+                        </option>
+
+                    </select>
+                </div>
+
+            </div>
+
+
+            <div class="d-flex gap-2 mt-4">
+
+                <button
+                    type="submit"
+                    class="btn btn-dark"
+                >
+                    Apply Filters
+                </button>
+
+                <a
+                    href="{{ url_for('main.home') }}"
+                    class="btn btn-outline-secondary"
+                >
+                    Reset
+                </a>
+
+            </div>
+
+        </form>
+
+    </div>
+</div>
+
+
 {% if jobs %}
 
     <div class="row g-4">
@@ -43,17 +188,21 @@ Jobs | JobBoard
 
                         </div>
 
+
                         <h2 class="h4">
                             {{ job.title }}
                         </h2>
+
 
                         <p class="text-muted mb-2">
                             {{ job.company }} · {{ job.location }}
                         </p>
 
+
                         <p>
                             {{ job.short_description }}
                         </p>
+
 
                         <div class="d-flex justify-content-between align-items-end mt-3">
 
@@ -78,6 +227,7 @@ Jobs | JobBoard
 
                             </div>
 
+
                             <strong>
                                 {{ job.salary }} {{ job.currency }}
                             </strong>
@@ -94,6 +244,7 @@ Jobs | JobBoard
 
     </div>
 
+
 {% else %}
 
     <div class="row justify-content-center">
@@ -105,12 +256,19 @@ Jobs | JobBoard
                 <div class="card-body text-center py-5">
 
                     <h2 class="h4">
-                        No vacancies yet
+                        No matching vacancies
                     </h2>
 
-                    <p class="text-muted mb-0">
-                        Job vacancies will appear here.
+                    <p class="text-muted mb-3">
+                        Try changing or resetting your search filters.
                     </p>
+
+                    <a
+                        href="{{ url_for('main.home') }}"
+                        class="btn btn-outline-dark"
+                    >
+                        Reset Filters
+                    </a>
 
                 </div>
 
