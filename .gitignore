@@ -22,3 +22,7 @@ htmlcov/
 
 .DS_Store
 Thumbs.db
+
+# Uploaded profile pictures
+app/static/profile_pics/*
+!app/static/profile_pics/.gitkeep

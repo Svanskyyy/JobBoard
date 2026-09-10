@@ -1,0 +1,121 @@
+{% extends "base.html" %}
+
+{% block title %}
+Profile | JobBoard
+{% endblock %}
+
+{% block content %}
+
+<div class="row justify-content-center">
+    <div class="col-lg-7">
+
+        <div class="card shadow-sm">
+            <div class="card-body p-4">
+
+                <div class="text-center mb-4">
+
+                    {% if image_url %}
+
+                        <img
+                            src="{{ image_url }}"
+                            alt="Profile picture"
+                            class="rounded-circle mb-3"
+                            style="
+                                width: 140px;
+                                height: 140px;
+                                object-fit: cover;
+                            "
+                        >
+
+                    {% else %}
+
+                        <div
+                            class="
+                                rounded-circle
+                                bg-dark
+                                text-white
+                                d-flex
+                                align-items-center
+                                justify-content-center
+                                mx-auto
+                                mb-3
+                            "
+                            style="
+                                width: 140px;
+                                height: 140px;
+                                font-size: 48px;
+                            "
+                        >
+                            {{ current_user.name[:1] | upper }}
+                        </div>
+
+                    {% endif %}
+
+                    <h1 class="h3">
+                        {{ current_user.name }}
+                    </h1>
+
+                    <p class="text-muted">
+                        {{ current_user.email }}
+                    </p>
+
+                </div>
+
+                <hr>
+
+                <form
+                    method="POST"
+                    enctype="multipart/form-data"
+                >
+
+                    {{ form.hidden_tag() }}
+
+                    <div class="mb-3">
+                        {{ form.name.label(class="form-label") }}
+
+                        {{ form.name(class="form-control") }}
+
+                        {% for error in form.name.errors %}
+                            <div class="text-danger small mt-1">
+                                {{ error }}
+                            </div>
+                        {% endfor %}
+                    </div>
+
+                    <div class="mb-3">
+                        {{ form.email.label(class="form-label") }}
+
+                        {{ form.email(class="form-control") }}
+
+                        {% for error in form.email.errors %}
+                            <div class="text-danger small mt-1">
+                                {{ error }}
+                            </div>
+                        {% endfor %}
+                    </div>
+
+                    <div class="mb-3">
+                        {{ form.picture.label(class="form-label") }}
+
+                        {{ form.picture(class="form-control") }}
+
+                        {% for error in form.picture.errors %}
+                            <div class="text-danger small mt-1">
+                                {{ error }}
+                            </div>
+                        {% endfor %}
+                    </div>
+
+                    <div class="d-grid">
+                        {{ form.submit(class="btn btn-dark") }}
+                    </div>
+
+                </form>
+
+            </div>
+        </div>
+
+    </div>
+</div>
+
+{% endblock %}

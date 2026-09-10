@@ -1,4 +1,6 @@
+from flask_login import current_user
 from flask_wtf import FlaskForm
+from flask_wtf.file import FileAllowed, FileField
 from wtforms import BooleanField, PasswordField, StringField, SubmitField
 from wtforms.validators import (
     DataRequired,
@@ -85,3 +87,49 @@ class LoginForm(FlaskForm):
     remember = BooleanField("Remember Me")
 
     submit = SubmitField("Login")
+
+
+class UpdateProfileForm(FlaskForm):
+    name = StringField(
+        "Name",
+        validators=[
+            DataRequired(),
+            Length(min=2, max=80),
+        ],
+    )
+
+    email = StringField(
+        "Email",
+        validators=[
+            DataRequired(),
+            Email(),
+            Length(max=120),
+        ],
+    )
+
+    picture = FileField(
+        "Profile Picture",
+        validators=[
+            FileAllowed(
+                ["jpg", "jpeg", "png"],
+                "Only JPG, JPEG and PNG images are allowed.",
+            )
+        ],
+    )
+
+    submit = SubmitField("Update Profile")
+
+    def validate_email(self, email):
+        normalized_email = email.data.strip().lower()
+
+        if normalized_email != current_user.email:
+            existing_user = db.session.scalar(
+                db.select(User).where(
+                    User.email == normalized_email
+                )
+            )
+
+            if existing_user:
+                raise ValidationError(
+                    "An account with this email already exists."
+                )

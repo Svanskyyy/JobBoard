@@ -1,7 +1,24 @@
-from flask import Blueprint, flash, redirect, render_template, url_for
-from flask_login import current_user, login_required, login_user, logout_user
+from flask import (
+    Blueprint,
+    flash,
+    redirect,
+    render_template,
+    request,
+    url_for,
+)
+from flask_login import (
+    current_user,
+    login_required,
+    login_user,
+    logout_user,
+)
 
-from app.auth.forms import LoginForm, RegistrationForm
+from app.auth.forms import (
+    LoginForm,
+    RegistrationForm,
+    UpdateProfileForm,
+)
+from app.auth.utils import save_profile_picture
 from app.extensions import db
 from app.models import User
 
@@ -19,24 +36,29 @@ def register():
     if form.validate_on_submit():
         user = User(
             name=form.name.data.strip(),
-            email=form.email.data.strip().lower()
+            email=form.email.data.strip().lower(),
         )
 
-        user.set_password(form.password.data)
+        user.set_password(
+            form.password.data
+        )
 
         db.session.add(user)
         db.session.commit()
 
         flash(
-            "Your account has been created successfully. You can now log in.",
-            "success"
+            "Your account has been created successfully. "
+            "You can now log in.",
+            "success",
         )
 
-        return redirect(url_for("auth.login"))
+        return redirect(
+            url_for("auth.login")
+        )
 
     return render_template(
         "register.html",
-        form=form
+        form=form,
     )
 
 
@@ -51,30 +73,36 @@ def login():
         email = form.email.data.strip().lower()
 
         user = db.session.scalar(
-            db.select(User).where(User.email == email)
+            db.select(User).where(
+                User.email == email
+            )
         )
 
-        if user and user.check_password(form.password.data):
+        if user and user.check_password(
+            form.password.data
+        ):
             login_user(
                 user,
-                remember=form.remember.data
+                remember=form.remember.data,
             )
 
             flash(
                 "You have logged in successfully.",
-                "success"
+                "success",
             )
 
-            return redirect(url_for("main.home"))
+            return redirect(
+                url_for("main.home")
+            )
 
         flash(
             "Invalid email or password.",
-            "danger"
+            "danger",
         )
 
     return render_template(
         "login.html",
-        form=form
+        form=form,
     )
 
 
@@ -85,7 +113,72 @@ def logout():
 
     flash(
         "You have been logged out.",
-        "info"
+        "info",
     )
 
-    return redirect(url_for("main.home"))
+    return redirect(
+        url_for("main.home")
+    )
+
+
+@auth_bp.route(
+    "/profile",
+    methods=["GET", "POST"],
+)
+@login_required
+def profile():
+    form = UpdateProfileForm()
+
+    if form.validate_on_submit():
+        current_user.name = (
+            form.name.data.strip()
+        )
+
+        current_user.email = (
+            form.email.data
+            .strip()
+            .lower()
+        )
+
+        if form.picture.data:
+            picture_file = (
+                save_profile_picture(
+                    form.picture.data
+                )
+            )
+
+            current_user.image_file = (
+                picture_file
+            )
+
+        db.session.commit()
+
+        flash(
+            "Your profile has been updated.",
+            "success",
+        )
+
+        return redirect(
+            url_for("auth.profile")
+        )
+
+    if request.method == "GET":
+        form.name.data = current_user.name
+        form.email.data = current_user.email
+
+    image_url = None
+
+    if current_user.image_file != "default.jpg":
+        image_url = url_for(
+            "static",
+            filename=(
+                "profile_pics/"
+                + current_user.image_file
+            ),
+        )
+
+    return render_template(
+        "profile.html",
+        form=form,
+        image_url=image_url,
+    )
