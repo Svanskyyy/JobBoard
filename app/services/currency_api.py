@@ -9,6 +9,9 @@ NBG_API_URL = (
 
 
 def convert_to_gel(amount, currency):
+    if not currency:
+        return None
+
     currency = currency.upper()
 
     if currency == "GEL":

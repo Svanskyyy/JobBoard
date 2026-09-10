@@ -1,5 +1,6 @@
 from flask import (
     Blueprint,
+    current_app,
     flash,
     redirect,
     render_template,
@@ -29,7 +30,9 @@ auth_bp = Blueprint("auth", __name__)
 @auth_bp.route("/register", methods=["GET", "POST"])
 def register():
     if current_user.is_authenticated:
-        return redirect(url_for("main.home"))
+        return redirect(
+            url_for("main.home")
+        )
 
     form = RegistrationForm()
 
@@ -65,12 +68,18 @@ def register():
 @auth_bp.route("/login", methods=["GET", "POST"])
 def login():
     if current_user.is_authenticated:
-        return redirect(url_for("main.home"))
+        return redirect(
+            url_for("main.home")
+        )
 
     form = LoginForm()
 
     if form.validate_on_submit():
-        email = form.email.data.strip().lower()
+        email = (
+            form.email.data
+            .strip()
+            .lower()
+        )
 
         user = db.session.scalar(
             db.select(User).where(
@@ -86,6 +95,11 @@ def login():
                 remember=form.remember.data,
             )
 
+            current_app.logger.info(
+                "Successful login: user_id=%s",
+                user.id,
+            )
+
             flash(
                 "You have logged in successfully.",
                 "success",
@@ -94,6 +108,10 @@ def login():
             return redirect(
                 url_for("main.home")
             )
+
+        current_app.logger.warning(
+            "Failed login attempt."
+        )
 
         flash(
             "Invalid email or password.",
@@ -163,8 +181,13 @@ def profile():
         )
 
     if request.method == "GET":
-        form.name.data = current_user.name
-        form.email.data = current_user.email
+        form.name.data = (
+            current_user.name
+        )
+
+        form.email.data = (
+            current_user.email
+        )
 
     image_url = None
 

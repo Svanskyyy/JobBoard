@@ -1,6 +1,7 @@
 from flask import (
     Blueprint,
     abort,
+    current_app,
     flash,
     redirect,
     render_template,
@@ -60,6 +61,12 @@ def add_job():
 
         db.session.add(job)
         db.session.commit()
+
+        current_app.logger.info(
+            "Job added: job_id=%s user_id=%s",
+            job.id,
+            current_user.id,
+        )
 
         flash(
             "Job vacancy has been published successfully.",
@@ -147,6 +154,12 @@ def edit_job(job_id):
 
         db.session.commit()
 
+        current_app.logger.info(
+            "Job edited: job_id=%s user_id=%s",
+            job.id,
+            current_user.id,
+        )
+
         flash(
             "Job vacancy has been updated successfully.",
             "success",
@@ -207,8 +220,16 @@ def delete_job(job_id):
     if not form.validate_on_submit():
         abort(400)
 
+    deleted_job_id = job.id
+
     db.session.delete(job)
     db.session.commit()
+
+    current_app.logger.info(
+        "Job deleted: job_id=%s user_id=%s",
+        deleted_job_id,
+        current_user.id,
+    )
 
     flash(
         "Job vacancy has been deleted.",
