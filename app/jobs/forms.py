@@ -83,3 +83,7 @@ class JobForm(FlaskForm):
     )
 
     submit = SubmitField("Publish Job")
+
+
+class DeleteJobForm(FlaskForm):
+    submit = SubmitField("Delete Job")
