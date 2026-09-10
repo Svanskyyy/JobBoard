@@ -12,6 +12,7 @@ from flask_login import current_user, login_required
 from app.extensions import db
 from app.jobs.forms import DeleteJobForm, JobForm
 from app.models import Category, Job, User
+from app.services.currency_api import convert_to_gel
 
 
 jobs_bp = Blueprint("jobs", __name__)
@@ -84,10 +85,19 @@ def job_detail(job_id):
 
     delete_form = DeleteJobForm()
 
+    gel_salary = None
+
+    if job.currency in {"USD", "EUR"}:
+        gel_salary = convert_to_gel(
+            job.salary,
+            job.currency,
+        )
+
     return render_template(
         "job_detail.html",
         job=job,
         delete_form=delete_form,
+        gel_salary=gel_salary,
     )
 
 

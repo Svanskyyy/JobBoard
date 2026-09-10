@@ -38,9 +38,26 @@
                     </div>
 
                     <div class="text-end">
-                        <strong class="fs-5">
+
+                        <strong class="fs-5 d-block">
                             {{ job.salary }} {{ job.currency }}
                         </strong>
+
+                        {% if gel_salary is not none
+                              and job.currency != "GEL" %}
+
+                            <small class="text-muted">
+                                ≈ {{ "%.2f"|format(gel_salary) }} GEL
+                            </small>
+
+                            <br>
+
+                            <small class="text-muted">
+                                Based on the official NBG exchange rate
+                            </small>
+
+                        {% endif %}
+
                     </div>
 
                 </div>
@@ -48,6 +65,7 @@
                 <hr>
 
                 <div class="mb-4">
+
                     <h2 class="h5">
                         Job Description
                     </h2>
@@ -55,6 +73,7 @@
                     <p style="white-space: pre-line;">
                         {{ job.description }}
                     </p>
+
                 </div>
 
                 <hr>
@@ -62,6 +81,7 @@
                 <div class="d-flex justify-content-between align-items-center">
 
                     <div>
+
                         <small class="text-muted">
                             Posted by
                             <a
@@ -77,6 +97,7 @@
                         <small class="text-muted">
                             {{ job.created_at.strftime("%d %b %Y") }}
                         </small>
+
                     </div>
 
                     {% if current_user.is_authenticated
