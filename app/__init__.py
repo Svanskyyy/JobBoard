@@ -1,16 +1,23 @@
 from flask import Flask
 
 from config import Config
-from app.extensions import db, migrate, login_manager
+from app.extensions import (
+    db,
+    login_manager,
+    migrate,
+)
 from app.logging_config import configure_logging
 
 
-def create_app():
+def create_app(config_class=Config):
     app = Flask(__name__)
 
-    app.config.from_object(Config)
+    app.config.from_object(
+        config_class
+    )
 
-    configure_logging(app)
+    if not app.config.get("TESTING"):
+        configure_logging(app)
 
     db.init_app(app)
     migrate.init_app(app, db)
