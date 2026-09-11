@@ -7,6 +7,11 @@ from app.extensions import (
     migrate,
 )
 from app.logging_config import configure_logging
+from app.translations import (
+    get_language,
+    t,
+    translate_category,
+)
 
 
 def create_app(config_class=Config):
@@ -36,5 +41,13 @@ def create_app(config_class=Config):
     app.register_blueprint(errors_bp)
 
     from app import models
+
+    @app.context_processor
+    def inject_translation_helpers():
+        return {
+            "t": t,
+            "translate_category": translate_category,
+            "current_language": get_language(),
+        }
 
     return app

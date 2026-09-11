@@ -4,7 +4,17 @@ def test_home_page(client):
     assert response.status_code == 200
 
     assert (
-        b"Find Your Next Opportunity"
+        b"Find work that"
+        in response.data
+    )
+
+    assert (
+        b"moves you forward."
+        in response.data
+    )
+
+    assert (
+        b"Search Jobs"
         in response.data
     )
 

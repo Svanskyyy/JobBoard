@@ -1,25 +1,42 @@
 {% extends "base.html" %}
 
+
 {% block title %}
-Jobs | JobBoard
+{{ t("jobs") }} | JobBoard
 {% endblock %}
+
 
 {% block content %}
 
-<div class="text-center mb-5">
+<section class="hero-section mb-5">
 
-    <h1 class="display-4 fw-bold">
-        Find Your Next Opportunity
-    </h1>
+    <div class="hero-content">
 
-    <p class="lead text-muted">
-        Discover job opportunities from different companies and categories.
-    </p>
+        <span class="hero-eyebrow">
+            {{ t("hero_eyebrow") }}
+        </span>
 
-</div>
+        <h1 class="hero-title mb-3">
+
+            {{ t("hero_title_line_1") }}
+
+            <br>
+
+            {{ t("hero_title_line_2") }}
+
+        </h1>
+
+        <p class="hero-text mb-0">
+            {{ t("hero_text") }}
+        </p>
+
+    </div>
+
+</section>
 
 
-<div class="card shadow-sm mb-5">
+<div class="card filter-card shadow-sm mb-4">
+
     <div class="card-body p-4">
 
         <form
@@ -30,11 +47,12 @@ Jobs | JobBoard
             <div class="row g-3">
 
                 <div class="col-lg-4">
+
                     <label
                         for="q"
-                        class="form-label"
+                        class="form-label fw-semibold"
                     >
-                        Search
+                        {{ t("search") }}
                     </label>
 
                     <input
@@ -42,18 +60,20 @@ Jobs | JobBoard
                         class="form-control"
                         id="q"
                         name="q"
-                        placeholder="Job title, company..."
+                        placeholder="{{ t('search_placeholder') }}"
                         value="{{ search_query }}"
                     >
+
                 </div>
 
 
                 <div class="col-lg-3">
+
                     <label
                         for="category"
-                        class="form-label"
+                        class="form-label fw-semibold"
                     >
-                        Category
+                        {{ t("category") }}
                     </label>
 
                     <select
@@ -63,7 +83,7 @@ Jobs | JobBoard
                     >
 
                         <option value="">
-                            All Categories
+                            {{ t("all_categories") }}
                         </option>
 
                         {% for category in categories %}
@@ -74,21 +94,23 @@ Jobs | JobBoard
                                     selected
                                 {% endif %}
                             >
-                                {{ category.name }}
+                                {{ translate_category(category.name) }}
                             </option>
 
                         {% endfor %}
 
                     </select>
+
                 </div>
 
 
                 <div class="col-lg-3">
+
                     <label
                         for="location"
-                        class="form-label"
+                        class="form-label fw-semibold"
                     >
-                        Location
+                        {{ t("location") }}
                     </label>
 
                     <input
@@ -96,18 +118,20 @@ Jobs | JobBoard
                         class="form-control"
                         id="location"
                         name="location"
-                        placeholder="e.g. Tbilisi"
+                        placeholder="{{ t('location_placeholder') }}"
                         value="{{ location }}"
                     >
+
                 </div>
 
 
                 <div class="col-lg-2">
+
                     <label
                         for="sort"
-                        class="form-label"
+                        class="form-label fw-semibold"
                     >
-                        Sort
+                        {{ t("sort") }}
                     </label>
 
                     <select
@@ -122,7 +146,7 @@ Jobs | JobBoard
                                 selected
                             {% endif %}
                         >
-                            Newest
+                            {{ t("newest") }}
                         </option>
 
                         <option
@@ -131,10 +155,11 @@ Jobs | JobBoard
                                 selected
                             {% endif %}
                         >
-                            Oldest
+                            {{ t("oldest") }}
                         </option>
 
                     </select>
+
                 </div>
 
             </div>
@@ -144,16 +169,16 @@ Jobs | JobBoard
 
                 <button
                     type="submit"
-                    class="btn btn-dark"
+                    class="btn btn-primary-custom px-4"
                 >
-                    Apply Filters
+                    {{ t("search_jobs") }}
                 </button>
 
                 <a
                     href="{{ url_for('main.home') }}"
-                    class="btn btn-outline-secondary"
+                    class="btn btn-outline-secondary px-4"
                 >
-                    Reset
+                    {{ t("reset") }}
                 </a>
 
             </div>
@@ -161,6 +186,39 @@ Jobs | JobBoard
         </form>
 
     </div>
+
+</div>
+
+
+<div
+    class="
+        d-flex
+        justify-content-between
+        align-items-end
+        mb-3
+    "
+>
+
+    <div>
+
+        <h2 class="section-title h3 mb-1">
+            {{ t("latest_opportunities") }}
+        </h2>
+
+        <p class="results-count mb-0">
+
+            {{ jobs|length }}
+
+            {% if jobs|length == 1 %}
+                {{ t("job_found") }}
+            {% else %}
+                {{ t("jobs_found") }}
+            {% endif %}
+
+        </p>
+
+    </div>
+
 </div>
 
 
@@ -172,71 +230,97 @@ Jobs | JobBoard
 
             <div class="col-lg-6">
 
-                <div class="card h-100 shadow-sm">
+                <article class="job-card h-100">
 
-                    <div class="card-body">
+                    <div class="card-body p-4">
 
-                        <div class="d-flex justify-content-between mb-2">
+                        <div
+                            class="
+                                d-flex
+                                justify-content-between
+                                align-items-start
+                                mb-3
+                            "
+                        >
 
-                            <span class="badge bg-dark">
-                                {{ job.category.name }}
+                            <span
+                                class="
+                                    job-category
+                                    category-{{ job.category.name|lower|replace(' ', '-') }}
+                                "
+                            >
+                                {{ translate_category(job.category.name) }}
                             </span>
 
-                            <small class="text-muted">
+                            <small class="job-meta">
                                 {{ job.created_at.strftime("%d %b %Y") }}
                             </small>
 
                         </div>
 
 
-                        <h2 class="h4">
+                        <h2 class="job-card-title h4 mb-2">
                             {{ job.title }}
                         </h2>
 
 
-                        <p class="text-muted mb-2">
-                            {{ job.company }} · {{ job.location }}
+                        <p class="job-meta mb-3">
+                            {{ job.company }}
+                            ·
+                            {{ job.location }}
                         </p>
 
 
-                        <p>
+                        <p class="mb-4">
                             {{ job.short_description }}
                         </p>
 
 
-                        <div class="d-flex justify-content-between align-items-end mt-3">
+                        <div
+                            class="
+                                d-flex
+                                justify-content-between
+                                align-items-end
+                                gap-3
+                            "
+                        >
 
                             <div>
 
-                                <small class="text-muted d-block mb-2">
-                                    Posted by
+                                <small class="job-meta d-block mb-3">
+
+                                    {{ t("posted_by") }}
+
                                     <a
                                         href="{{ url_for('jobs.user_jobs', user_id=job.author.id) }}"
-                                        class="text-decoration-none"
+                                        class="text-decoration-none fw-semibold"
                                     >
                                         {{ job.author.name }}
                                     </a>
+
                                 </small>
+
 
                                 <a
                                     href="{{ url_for('jobs.job_detail', job_id=job.id) }}"
-                                    class="btn btn-outline-dark btn-sm"
+                                    class="btn btn-outline-primary-custom btn-sm px-3"
                                 >
-                                    Read More
+                                    {{ t("view_job") }}
                                 </a>
 
                             </div>
 
 
-                            <strong>
-                                {{ job.salary }} {{ job.currency }}
-                            </strong>
+                            <span class="salary-text">
+                                {{ job.salary }}
+                                {{ job.currency }}
+                            </span>
 
                         </div>
 
                     </div>
 
-                </div>
+                </article>
 
             </div>
 
@@ -247,32 +331,28 @@ Jobs | JobBoard
 
 {% else %}
 
-    <div class="row justify-content-center">
+    <div class="card job-card">
 
-        <div class="col-md-8">
+        <div class="card-body text-center py-5">
 
-            <div class="card">
-
-                <div class="card-body text-center py-5">
-
-                    <h2 class="h4">
-                        No matching vacancies
-                    </h2>
-
-                    <p class="text-muted mb-3">
-                        Try changing or resetting your search filters.
-                    </p>
-
-                    <a
-                        href="{{ url_for('main.home') }}"
-                        class="btn btn-outline-dark"
-                    >
-                        Reset Filters
-                    </a>
-
-                </div>
-
+            <div class="display-5 mb-3">
+                🔎
             </div>
+
+            <h2 class="h4">
+                {{ t("no_matching_jobs") }}
+            </h2>
+
+            <p class="text-muted mb-4">
+                {{ t("no_matching_jobs_text") }}
+            </p>
+
+            <a
+                href="{{ url_for('main.home') }}"
+                class="btn btn-primary-custom"
+            >
+                {{ t("view_all_jobs") }}
+            </a>
 
         </div>
 

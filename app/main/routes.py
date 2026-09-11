@@ -1,11 +1,21 @@
-from flask import Blueprint, render_template, request
+from flask import (
+    Blueprint,
+    redirect,
+    render_template,
+    request,
+    session,
+    url_for,
+)
 from sqlalchemy import or_
 
 from app.extensions import db
 from app.models import Category, Job
 
 
-main_bp = Blueprint("main", __name__)
+main_bp = Blueprint(
+    "main",
+    __name__,
+)
 
 
 @main_bp.route("/")
@@ -33,32 +43,46 @@ def home():
     statement = db.select(Job)
 
     if search_query:
-        search_term = f"%{search_query}%"
+        search_term = (
+            f"%{search_query}%"
+        )
 
         statement = statement.where(
             or_(
-                Job.title.ilike(search_term),
-                Job.company.ilike(search_term),
-                Job.short_description.ilike(search_term),
+                Job.title.ilike(
+                    search_term
+                ),
+                Job.company.ilike(
+                    search_term
+                ),
+                Job.short_description.ilike(
+                    search_term
+                ),
             )
         )
 
     if category_id:
         statement = statement.where(
-            Job.category_id == category_id
+            Job.category_id
+            == category_id
         )
 
     if location:
-        location_term = f"%{location}%"
+        location_term = (
+            f"%{location}%"
+        )
 
         statement = statement.where(
-            Job.location.ilike(location_term)
+            Job.location.ilike(
+                location_term
+            )
         )
 
     if sort == "oldest":
         statement = statement.order_by(
             Job.created_at.asc()
         )
+
     else:
         sort = "newest"
 
@@ -91,4 +115,34 @@ def home():
 def about():
     return render_template(
         "about.html"
+    )
+
+
+@main_bp.route(
+    "/language/<language>"
+)
+def set_language(language):
+    if language not in {
+        "en",
+        "ka",
+    }:
+        language = "en"
+
+    session["language"] = language
+
+    next_page = request.args.get(
+        "next"
+    )
+
+    if (
+        next_page
+        and next_page.startswith("/")
+        and not next_page.startswith("//")
+    ):
+        return redirect(
+            next_page
+        )
+
+    return redirect(
+        url_for("main.home")
     )
